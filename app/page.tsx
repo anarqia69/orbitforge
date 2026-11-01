@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
 import { Keypair, SystemProgram, Transaction } from "@solana/web3.js";
-import { AuthorityType, MINT_SIZE, TOKEN_PROGRAM_ID, createAssociatedTokenAccountInstruction, createInitializeMintInstruction, createMintToInstruction, getAssociatedTokenAddress, setAuthority } from "@solana/spl-token";
+import { AuthorityType, MINT_SIZE, TOKEN_PROGRAM_ID, createAssociatedTokenAccountInstruction, createInitializeMintInstruction, createMintToInstruction, getAssociatedTokenAddress, createSetAuthorityInstruction } from "@solana/spl-token";
 
 export default function Home() {
  const { connection } = useConnection();
@@ -26,8 +26,8 @@ export default function Home() {
    tx.add(createInitializeMintInstruction(mint.publicKey,d,publicKey,revokeFreeze?null:publicKey));
    tx.add(createAssociatedTokenAccountInstruction(publicKey,ata,publicKey,mint.publicKey));
    tx.add(createMintToInstruction(mint.publicKey,ata,publicKey,amount));
-   if(revokeMint) tx.add(setAuthority(mint.publicKey,publicKey,AuthorityType.MintTokens,null,[]));
-   if(revokeFreeze) tx.add(setAuthority(mint.publicKey,publicKey,AuthorityType.FreezeAccount,null,[]));
+   if(revokeMint) tx.add(createSetAuthorityInstruction(mint.publicKey,publicKey,AuthorityType.MintTokens,null));
+   if(revokeFreeze) tx.add(createSetAuthorityInstruction(mint.publicKey,publicKey,AuthorityType.FreezeAccount,null));
    const latest=await connection.getLatestBlockhash("confirmed"); tx.feePayer=publicKey; tx.recentBlockhash=latest.blockhash; tx.partialSign(mint);
    setStatus("Please approve the transaction in your wallet…");
    const signed=await signTransaction(tx); const sig=await connection.sendRawTransaction(signed.serialize(),{skipPreflight:false,preflightCommitment:"confirmed"});
