@@ -23,7 +23,7 @@ export default function Home() {
    const rent=await connection.getMinimumBalanceForRentExemption(MINT_SIZE);
    const tx=new Transaction();
    tx.add(SystemProgram.createAccount({fromPubkey:publicKey,newAccountPubkey:mint.publicKey,space:MINT_SIZE,lamports:rent,programId:TOKEN_PROGRAM_ID}));
-   tx.add(createInitializeMintInstruction(mint.publicKey,d,publicKey,revokeFreeze?null:publicKey));
+   tx.add(createInitializeMintInstruction(mint.publicKey,d,publicKey,publicKey));
    tx.add(createAssociatedTokenAccountInstruction(publicKey,ata,publicKey,mint.publicKey));
    tx.add(createMintToInstruction(mint.publicKey,ata,publicKey,amount));
    if(revokeMint) tx.add(createSetAuthorityInstruction(mint.publicKey,publicKey,AuthorityType.MintTokens,null));
